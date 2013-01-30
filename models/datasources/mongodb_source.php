@@ -661,7 +661,35 @@ class MongodbSource extends DboSource {
 
 		return $return;
 	}
+        
+/**
+ * dropIndexes method
+ *
+ * @param mixed $Model
+ * @return database response
+ * @access public
+ */
+	public function dropIndexes(&$Model) {
+		if (!$this->isConnected()) {
+			return false;
+		}
 
+		$this->_prepareLogQuery($Model); // just sets a timer
+
+		try{
+			$return = $this->_db
+				->selectCollection($Model->table)
+				->deleteIndexes();
+		} catch (MongoException $e) {
+			$this->error = $e->getMessage();
+			trigger_error($this->error);
+		}
+		if ($this->fullDebug) {
+			$this->logQuery("db.{$Model->useTable}.dropIndexes()");
+		}
+
+		return $return;
+	}
 /**
  * Update Data
  *
